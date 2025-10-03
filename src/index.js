@@ -11,5 +11,5 @@ app.use('/', routes);
 
 const port = env.PORT || 8080;
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port} and ready to use !`);
 });
