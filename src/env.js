@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports = {
     // Network
     PORT: process.env.PORT,

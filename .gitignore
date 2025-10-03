@@ -5,10 +5,3 @@ node_modules
 /generated/prisma
 
 node_modules
-
-# Docker Files
-docker-compose.override.yml
-Dockerfile.dev
-Dockerfile.prod
-Dockerfile
-docker-compose.yml
