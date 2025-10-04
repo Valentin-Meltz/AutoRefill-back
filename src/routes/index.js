@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
   res.send('Ça marche !');
 });
 
-router.use('/intermarche', intermarcheApi);
+router.use('/products', intermarcheApi);
 router.use('/user', userRoutes);
 
 module.exports = router;
