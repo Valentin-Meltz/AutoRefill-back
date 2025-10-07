@@ -1,8 +1,36 @@
 const express = require('express');
+const axios = require('axios');
 const router  = express.Router();
+ 
+// Route to fetch all products data from a public API
+router.get('/', async (req, res) => {
+  try {
+    const response = await axios.get("https://fakestoreapi.com/products",
+      {
+        headers: { Authorization: "Basic " + Buffer.from("off:off").toString("base64") },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching product data:", error.message);
+    res.status(500).json({ error: "Failed to fetch product data" });
+  }
+});
 
-router.get('/hello', (req, res) => {
-  res.send('Hello!');
+// Route to fetch a specific product by ID from a public API
+router.get('/:id', async (req, res) => {
+  try{
+    const productId = req.params.id;
+    const response = await axios.get('https://fakestoreapi.com/products/' + productId,
+      {
+        headers: { Authorization: "Basic " + Buffer.from("off:off").toString("base64") },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching product data:", error.message);
+    res.status(500).json({ error: "Failed to fetch product data" });
+  }
 });
 
 module.exports = router;

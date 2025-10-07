@@ -17,8 +17,40 @@ router.post('/create', async (req, res) => {
   }
 });
 
-router.get('/', (req, res) => {
-  res.send('User route is working!');
+// get user by logs
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body || {};
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'email et password sont requis' });
+    }
+    
+    const { rows } = await db.query('SELECT * FROM "User" WHERE email = $1 AND password = $2', [email, password]);
+    
+    if (rows.length === 0) {
+      return res.status(401).json({ error: 'Identifiants invalides' });
+    }
+    return res.status(200).json(rows[0]);
+  } catch (error) {
+    console.error('Error during login:', error);
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// get user by id
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rows } = await db.query('SELECT * FROM "User" WHERE id = $1', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Utilisateur introuvable' });
+    }
+    res.json(rows[0]);
+  } catch (error) {
+    console.error('Error fetching user by id:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
+  }
 });
 
 module.exports = router;
