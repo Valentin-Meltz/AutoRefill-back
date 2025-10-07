@@ -5,11 +5,7 @@ const router  = express.Router();
 // Route to fetch all products data from a public API
 router.get('/', async (req, res) => {
   try {
-    const response = await axios.get("https://fakestoreapi.com/products",
-      {
-        headers: { Authorization: "Basic " + Buffer.from("off:off").toString("base64") },
-      }
-    );
+    const response = await axios.get("https://fakestoreapi.com/products");
     res.json(response.data);
   } catch (error) {
     console.error("Error fetching product data:", error.response?.status, error.response?.data);
@@ -21,11 +17,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try{
     const productId = req.params.id;
-    const response = await axios.get('https://fakestoreapi.com/products/' + productId,
-      {
-        headers: { Authorization: "Basic " + Buffer.from("off:off").toString("base64") },
-      }
-    );
+    const response = await axios.get('https://fakestoreapi.com/products/' + productId);
     res.json(response.data);
   } catch (error) {
     console.error("Error fetching product data:", error.message);
