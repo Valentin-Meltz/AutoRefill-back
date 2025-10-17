@@ -1,0 +1,78 @@
+version: "3.8"
+
+networks:
+  proxy-net:
+    external: true
+  internal:
+    driver: bridge
+
+services:
+  autorefill_frontend:
+    build: ./frontend
+    container_name: autorefill_frontend
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.autorefill_frontend.rule=Host(`autorefill.plmpro.fr`)"
+      - "traefik.http.routers.autorefill_frontend.entrypoints=websecure"
+      - "traefik.http.routers.autorefill_frontend.tls.certresolver=myresolver"
+
+      - "traefik.http.routers.autorefill_frontend_www.rule=Host(`www.autorefill.plmpro.fr`)"
+      - "traefik.http.routers.autorefill_frontend_www.entrypoints=websecure"
+      - "traefik.http.routers.autorefill_frontend_www.tls.certresolver=myresolver"
+
+      - "traefik.http.services.autorefill_frontend.loadbalancer.server.port=80"
+    networks:
+      - proxy-net
+    env_file:
+      - .env
+
+  autorefill_backend:
+    build: ./backend
+    container_name: autorefill_backend
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.autorefill_backend.rule=Host(`api.autorefill.plmpro.fr`)"
+      - "traefik.http.routers.autorefill_backend.entrypoints=websecure"
+      - "traefik.http.routers.autorefill_backend.tls.certresolver=myresolver"
+      - "traefik.http.services.autorefill_backend.loadbalancer.server.port=3000"
+    networks:
+      - proxy-net
+    env_file:
+      - .env
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+
+  autorefill_db:
+    image: postgres:15
+    container_name: autorefill_db
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - autorefill_db_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - proxy-net
+ 
+  autorefill_pgadmin:
+    image: dpage/pgadmin4
+    container_name: autorefill_pgadmin
+    restart: always
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.autorefill_pgadmin.rule=Host(`pgadmin.autorefill.plmpro.fr`)"
+      - "traefik.http.routers.autorefill_pgadmin.entrypoints=websecure"
+      - "traefik.http.routers.autorefill_pgadmin.tls.certresolver=myresolver"
+      - "traefik.http.services.autorefill_pgadmin.loadbalancer.server.port=80"
+    networks:
+      - proxy-net
+
+volumes:
+  autorefill_db_data:
